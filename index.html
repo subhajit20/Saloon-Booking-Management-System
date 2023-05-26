@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Uploading Base64 Image String...</h1>
+    <img src="" alt="" id="newImage" height="200" width="200" />
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="myFile" id="myFile" />
+        <input type="submit" value="Upload" id="uploadBtn" />
+    </form>
+
+    <script>
+        const uploadBtn = document.getElementById("uploadBtn");
+        const myFile = document.getElementById("myFile");
+        const newImage = document.getElementById("newImage");
+
+        const imageToBase64 = (file, type, callback) => {
+            var reader = new FileReader();
+            let base64Text = null;
+            reader.onload = function() {
+                // Read the contents of the file and convert it to base64
+                var binaryData = reader.result;
+                var base64Data = btoa(binaryData);
+                base64Text = base64Data;
+                callback(base64Text);
+            };
+
+            reader.readAsBinaryString(file);
+        };
+
+        uploadBtn.addEventListener("click", async(e) => {
+            e.preventDefault();
+
+            if (myFile.files[0].type === "image/jpeg") {
+                imageToBase64(myFile.files[0], "jpeg", async(imageText) => {
+                    const res = await fetch("http://localhost:2000/upload", {
+                        method: "POST",
+                        headers: {
+                            "content-type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            image: imageText,
+                        }),
+                    });
+                    const data = await res.json();
+                    // console.log(data);
+                    newImage.src = `data:image/jpeg;base64,${data.msg}`;
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
