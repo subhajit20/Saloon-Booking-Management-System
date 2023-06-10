@@ -19,7 +19,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 
-app.use('/api/user',userRouter);
+app.use('/api',userRouter);
 
 app.listen(PORT, () => {
     return console.log(`server is listening on http://localhost:${PORT}`);
