@@ -2,21 +2,21 @@ import {
     Login,
     Signup,
  } from "../controller/user.controller";
-import express,{ Router } from 'express';
+import express,{ Router,Request,Response } from 'express';
 import { customMiddleware } from "../middlewares/user.controller";
-import CustomRequest from "../types/customRequest";
-import { NextFunction, RequestHandler } from "express";
 
 const userRouter:Router = express.Router();
 
 userRouter.post("/alluser",Login);
 userRouter.post("/signup",Signup);
 
-userRouter.post("/test",customMiddleware,(req:CustomRequest,res)=>{
-    res.json({
-        msg:"Okkkkkk"
+userRouter.get("/testing",customMiddleware,(_req,_res)=>{
+    // const {name} = _req.app.locals;
+    console.log(_req.tokenData.userId)
+    _res.json({
+        userid:"Okk"
     })
-});
+})
 
 export default userRouter;
 
