@@ -1,5 +1,9 @@
 import User from '../models/User';
 import {Request,Response} from 'express'
+import bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv'
+dotenv.config();
+
 
 export const Login = async (req:Request,res:Response) =>{
     try{
@@ -34,7 +38,8 @@ export const Signup = async (req:Request,res:Response) =>{
     try{
         res.contentType("application/json");
         const {
-            email
+            email,
+            password
         } = req.body;
 
         const isExist = await User.find({email:email});
@@ -44,23 +49,56 @@ export const Signup = async (req:Request,res:Response) =>{
                 name:"Exist"
             }
         }else{
-            const newUser = new User(req.body);
-
+            let encryptedPassword = await bcrypt.hash(password,10);
+            console.log(encryptedPassword);
+            const newUser = new User({...req.body,password:encryptedPassword});
             newUser.save();
+            console.log(newUser);
             res.status(200).json({
-                msg:"Signup Successful!"
+                status:true,
+                msg:"Signup Successful!",
+                userInfo:newUser
             })
         }
 
     }catch(e:any){
+        
         if(e.name === "Exist"){
             res.status(300).json({
+                status:false,
                 msg:"User already exist..."
             })
         }else{
             res.status(500).json({
+                status:false,
                 msg:"Something went wrong..."
             })
         }
+    }
+}
+
+export const getAllUser = async (req:Request,res:Response) =>{
+    try{
+        console.log(req.headers.role);
+        const allUser = await User.find({},{__v:0});
+
+        if(allUser.length > 0){
+            res.status(200).json({
+                status:true,
+                users:allUser
+            })
+        }else{
+            res.status(200).json({
+                status:false,
+                msg:"No User found...",
+                users:[]
+            })
+        }
+    }catch(e){
+        res.status(500).json({
+            status:false,
+            msg:"No User found...",
+            error:e
+        })
     }
 }

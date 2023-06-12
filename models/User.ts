@@ -12,6 +12,11 @@ const userSchema = new Schema({
         type:String,
         required:true
     },
+    userRole:{
+        type:String,
+        enum:['user','admin'],
+        default:"user"
+    },
     email:{
         type:String,
         trim:true,
@@ -19,6 +24,11 @@ const userSchema = new Schema({
     },
     password:{
         type:String,
+        trim:true,
+        required:true
+    },
+    phonenumber:{
+        type:Number,
         trim:true,
         required:true
     },
